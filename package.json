@@ -1,0 +1,20 @@
+{
+  "name": "atlan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongodb": "^4.1.0",
+    "nodemon": "^2.0.12",
+    "twilio": "^3.66.1",
+    "winston": "^3.3.3"
+  }
+}
