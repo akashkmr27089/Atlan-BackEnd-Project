@@ -11,9 +11,15 @@ router.post('/UpdateQandA', async function (req, res) {
     var userName = req.body.userName;
     var formId = req.body.formId;
     var questionChanges = req.body.questionChanges;
-    console.log(questionChanges.QuestionId, userName, formId);
-    var response = await SurveyDataCollector.UpdateQandA(userName, formId, questionChanges);
-    res.send(response);
+    responses = [];
+    // This will parallely execute tasks on the Server
+    await Promise.all(questionChanges.map(async (element) => {
+        console.log(element.QuestionId, userName, formId);
+        var response = await SurveyDataCollector.UpdateQandA(userName, formId, element);
+        console.log("response from the server", response);
+        responses.push(response);
+    }));
+    res.send(responses);
 });
 
 

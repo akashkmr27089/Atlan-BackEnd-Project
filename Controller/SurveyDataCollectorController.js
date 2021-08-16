@@ -72,6 +72,7 @@ async function UpdateQandA(userName, formId, questionAns) {
                     var FormId = ObjectId(formId);
                     var querry = { _id: FormId, userId: userName, "questionAnsId.QuestionId": questionAns.QuestionId };
                     // var querry = { "questionAnsId.grade": 80 };
+                    var NewQuestionId = `${Date.now() + Math.floor(Math.random() * 100)}`;
                     console.log("Querry", querry);
                     dbo.collection("Forms").findOne(querry, (err, result) => {
                         if (err) {
@@ -80,7 +81,7 @@ async function UpdateQandA(userName, formId, questionAns) {
                             if (result == undefined) {
                                 console.log("Result2 : ", result);
                                 // Add the data into the database 
-                                var updateData = [{ $set: { questionAnsId: { $concatArrays: ["$questionAnsId", [{ QuestionId: `${Date.now()}` }]] } } }];
+                                var updateData = [{ $set: { questionAnsId: { $concatArrays: ["$questionAnsId", [{ QuestionId: NewQuestionId }]] } } }];
                                 var querryTemp = { _id: FormId, userId: userName, }
                                 dbo.collection("Forms").updateOne(querryTemp, updateData, (err, result) => {
                                     if (err) {
@@ -90,6 +91,7 @@ async function UpdateQandA(userName, formId, questionAns) {
                                         logger.info("Entry Added to the Form Database");
                                         console.log(result);
                                         //Adding Entry into the Questions and Answer Database
+                                        // First Check in the Database and modify if exists 
                                     }
                                 });
                             } else {

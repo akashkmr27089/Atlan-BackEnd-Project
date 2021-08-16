@@ -15,11 +15,14 @@ var wiki = require('./MongoDbTest/Testing/wiki');
 var form = require('./Routes/Form');
 var user = require('./Routes/Users');
 var survey = require('./Routes/SurveyDataCollector');
+var question = require('./Routes/Questions');
 
 app.use('/wiki', wiki);
 app.use('/Form', form);
 app.use('/User', user);
 app.use('/survey', survey);
+app.use('/question', question);
+
 
 //Global Variable Declaration
 const port = process.env.PORT;
