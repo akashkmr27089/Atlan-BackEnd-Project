@@ -111,20 +111,101 @@ var url = "mongodb://localhost:27017/";
 //     });
 // }
 
+// MongoClient.connect(url, function (err, db) {
+//     if (err) throw err;
+//     var dbo = db.db("atlan");
+//     // var query = { name: "Ben" };
+
+//     dbo.collection("users").find(query).count(function (err, result) {
+//         if (err) throw err;
+//         if (result == 1)
+//             resolve(true);
+//         else
+//             resolve(false);
+//         db.close();
+//     });
+// });
+
+//////////////////////////////
+
+// For Adding Entry into the Form
+//This is for concatinating the data into the database 
+// MongoClient.connect(url, function (err, db) {
+//     if (err) throw err;
+//     var dbo = db.db("atlan");
+//     var myquery = { userId: "testing" };
+//     var newvalues = [{ $set: { questionAnsId: { $concatArrays: ["$questionAnsId", [8, 6]] } } }]
+//     dbo.collection("Forms").updateOne(myquery, newvalues, function (err, res) {
+//         if (err) throw err;
+//         console.log(res);
+//         // db.close();
+//     });
+
+//     dbo.collection("Forms").find({ userId: "testing" }).toArray((err, res) => {
+//         console.log(res);
+//         db.close();
+//     })
+// });
+
+//////////////////////////////
+
+//Modifying the Form Id 
 MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     var dbo = db.db("atlan");
-    // var query = { name: "Ben" };
 
-    dbo.collection("users").find(query).count(function (err, result) {
-        if (err) throw err;
-        if (result == 1)
-            resolve(true);
-        else
-            resolve(false);
-        db.close();
+    //For setting the value individually 
+    // var test = { $set: { questionAnsId: { "asdf": 23 } } }
+    // dbo.collection("Forms").updateOne({ userId: "akashkmr279@gmail.com" }, test, function (err, res) {
+    //     console.log(res);
+    // });
+
+    // Adding Array to the List 
+    // var test = { $set: { questionAnsId: { "asdf": [{ test: 'nation', test2: 'nation2' }] } } }
+    // dbo.collection("Forms").updateOne({ userId: "akashkmr279@gmail.com" }, test, function (err, res) {
+    //     console.log(res);
+    // });
+
+    var test = { $set: { questionAnsId: [{ grade: 80, mean: 75, std: 8 }] } }
+    dbo.collection("Forms").updateOne({ userId: "akashkmr279@gmail.com" }, test, function (err, res) {
+        console.log(res);
     });
+
+    // Concat Array 
+    // var test = { $set: { questionAnsId: [{ grade: 80, mean: 75, std: 8 }] } }
+    var test = [{ $set: { questionAnsId: { $concatArrays: ["$questionAnsId", [{ grade: 23, mean: 43, std: 12 }]] } } }]
+    dbo.collection("Forms").updateOne({ userId: "akashkmr279@gmail.com" }, test, function (err, res) {
+        console.log(res);
+    });
+
+    // var test = { $set: { questionAnsId: { "asdf.$.test": 23 } } }
+    var test = { $set: { "questionAnsId.$.std": 63 } };
+    dbo.collection("Forms").updateOne({ userId: "akashkmr279@gmail.com", "questionAnsId.grade": 23 }, test, function (err, res) {
+        if (err) throw err;
+        console.log(res);
+    });
+
+    // var myquery = { userId: "testing", questionAnsId: 11 };
+    // // var newvalues = [{ $set: { questionAnsId: { $concatArrays: ["$questionAnsId", [8, 6]] } } }]
+    // var newvalues = { $set: { "questionAnsId.$[23]": 230 } }
+    // dbo.collection("Forms").updateOne(myquery, newvalues, function (err, res) {
+    //     if (err) throw err;
+    //     console.log(res);
+    //     // db.close();
+    // });
+
+    // dbo.collection("Forms").find({ userId: "akashkmr279@gmail.com", questionAnsId: { asdf: [{ test: "nation", test2: "nation2" }] } }).toArray((err, res) => {
+    //     console.log(res);
+    //     db.close();
+    // })
+
+    dbo.collection("Forms").find({ userId: "akashkmr279@gmail.com", "questionAnsId.grade": 80 }).toArray((err, res) => {
+        console.log(res);
+        db.close();
+    })
 });
+
+
 
 // MongoClient.connect(url, function (err, db) {
 //     if (err) throw err;

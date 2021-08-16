@@ -1,7 +1,7 @@
 var express = require('express');
 const logger = require('../src/Logger');
 var router = express.Router();
-var users = require('../Controller/Users');
+var users = require('../Controller/UsersController');
 
 // Creates User into Database
 router.post('/', async function (req, res) {
@@ -18,7 +18,6 @@ router.post('/', async function (req, res) {
 // Get Information about the User
 router.post('/IfUserExists', async function (req, res) {
     logger.info("Attempting to verify User if it exists");
-    var userName = req.body.userName
     var response = false;
     var userName = req.body.userName
     if (userName != undefined) {

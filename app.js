@@ -14,10 +14,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var wiki = require('./MongoDbTest/Testing/wiki');
 var form = require('./Routes/Form');
 var user = require('./Routes/Users');
+var survey = require('./Routes/SurveyDataCollector');
 
 app.use('/wiki', wiki);
 app.use('/Form', form);
 app.use('/User', user);
+app.use('/survey', survey);
 
 //Global Variable Declaration
 const port = process.env.PORT;
