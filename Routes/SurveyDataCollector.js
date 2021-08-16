@@ -11,7 +11,7 @@ router.post('/UpdateQandA', async function (req, res) {
     var userName = req.body.userName;
     var formId = req.body.formId;
     var questionChanges = req.body.questionChanges;
-    // console.log(questionChanges, userName, formId);
+    console.log(questionChanges.QuestionId, userName, formId);
     var response = await SurveyDataCollector.UpdateQandA(userName, formId, questionChanges);
     res.send(response);
 });
@@ -40,7 +40,15 @@ router.delete('/DeleteForm', async function (req, res) {
 });
 
 
-
+router.post('/verifyUserIdFormId', async function (req, res) {
+    logger.info("Starting Execution of /UpdateQandA post request}");
+    var response = false;
+    var userName = req.body.userName;
+    var formId = req.body.formId;
+    console.log(userName, formId);
+    var response = await SurveyDataCollector.verifyUserIdFormId(formId, userName);
+    res.send(response);
+});
 
 
 
