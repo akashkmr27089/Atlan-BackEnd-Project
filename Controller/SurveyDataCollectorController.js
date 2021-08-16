@@ -6,6 +6,7 @@ const { ObjectId } = require('mongodb');
 var database = process.env.DATABASE;
 const User = require('./UsersController');
 const Form = require('./FormController');
+const QuestionsController = require('./QuestionsController');
 
 // Function to Verify if the fromid is from the same userName 
 async function verifyUserIdFormId(formid, userName) {
@@ -92,12 +93,15 @@ async function UpdateQandA(userName, formId, questionAns) {
                                         console.log(result);
                                         //Adding Entry into the Questions and Answer Database
                                         // First Check in the Database and modify if exists 
+                                        var res = QuestionsController.QuestionUpdation(formId, questionAns);
+                                        resolve({ "response": true, res: res })
                                     }
                                 });
                             } else {
                                 //The data Exists on the Database
                                 console.log("Result :", result);
-
+                                var res = QuestionsController.QuestionUpdation(formId, questionAns);
+                                resolve({ "response": true, res: res })
                             }
                         }
                     });

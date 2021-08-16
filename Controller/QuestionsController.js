@@ -4,7 +4,7 @@ var MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb');
 var database = process.env.DATABASE;
 
-// Function Responsible for Updating Questions and 
+// Function Responsible for Updating and Inserting Questions and Answers
 function QuestionUpdation(formId, Qdata) {
     return new Promise(resolve => {
         var FormId = ObjectId(formId);
@@ -22,10 +22,11 @@ function QuestionUpdation(formId, Qdata) {
                         resolve({ response: false, message: err.message });
                         db.close();
                     } else {
+                        var ansId = (Qdata.AnswerId != "" && Qdata.AnswerId != null) ? Qdata.AnswerId : `${Date.now() + Math.floor(Math.random() * 100)}`;
+                        console.log("AnsId", ansId, Qdata.AnswerId)
                         if (res == undefined) {
                             logger.error(res, "No Entry in the Database");
                             //Insert Data Into Database
-                            var ansId = (Qdata.AnswerId != "") ? Qdata.AnswerId : `${Date.now() + Math.floor(Math.random() * 100)}`;
                             var QNewData = {
                                 QuestionId: Qdata.QuestionId, Question: Qdata.Question, QuestionMeta: Qdata.QuestionMeta,
                                 AnswerId: ansId, AnswerType: Qdata.AnswerType, formId: FormId
@@ -44,7 +45,7 @@ function QuestionUpdation(formId, Qdata) {
                             //Inserting data to AnsOption Database 
                             if (Qdata.AnswerType == "Option") {
                                 var ANewData = {
-                                    formId: FormId, AnaswerId: ansId, AnswerOptions: Qdata.AnswerOptions, AnswerType: Qdata.AnswerType,
+                                    formId: FormId, AnswerId: ansId, AnswerOptions: Qdata.AnswerOptions, AnswerType: Qdata.AnswerType,
                                     CorrectOption_min: 1, CorrectOption_max: 1
                                 }
                                 dbo.collection("AnsOptions").insertOne(ANewData, (err, res) => {
@@ -69,27 +70,32 @@ function QuestionUpdation(formId, Qdata) {
                                 }
                             };
                             var querry = { formId: FormId, QuestionId: Qdata.QuestionId };
-                            dbo.collection("Questions").updateOne(querry, QNewData, (err, res) => {
+                            dbo.collection("Questions").findOneAndUpdate(querry, QNewData, (err, res) => {
                                 if (err) {
                                     logger.error({ response: false, message: err.message });
                                     resolve({ response: false, message: err.message });
                                 } else {
                                     logger.info("New Answer Updated into the Database");
-                                    console.log("Answer Updated Data", res)
+                                    console.log("Answer Updated Data", res);
                                     resolve({ response: true, message: "New Entry Updated", res: res });
                                 }
                             });
+                            console.log("testing", res.AnswerId);
                             //Updating Answer Updatation
                             if (Qdata.AnswerType == 'Option') {
                                 var ANewData = {
                                     $set: {
                                         AnswerOptions: Qdata.AnswerOptions, AnswerType: Qdata.AnswerType,
-                                        CorrectOption_min: 1, CorrectOption_max: 1
+                                        CorrectOption_min: Qdata.CorrectOption_min, CorrectOption_max: Qdata.CorrectOption_max
                                     }
                                 }
                                 var querry = {
-                                    formId: FormId, AnswerId: ansId
+                                    formId: FormId, AnswerId: res.AnswerId
                                 }
+
+                                // dbo.collection("AnsOptions").findOne(querry, (err, res) => {
+                                //     console.log("Restulting ", res, querry);
+                                // });
                                 dbo.collection("AnsOptions").updateOne(querry, ANewData, (err, res) => {
                                     if (err) {
                                         logger.error({ response: false, message: err.message });
@@ -99,7 +105,7 @@ function QuestionUpdation(formId, Qdata) {
                                         console.log("Answer Updated Data", res)
                                         resolve({ response: true, message: "New Entry Updated", res: res });
                                     }
-                                })
+                                });
                             } else {
                                 // If its changed to NoOption then delete that entry in the database 
                             }
