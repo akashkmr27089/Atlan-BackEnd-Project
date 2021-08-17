@@ -16,12 +16,14 @@ var form = require('./Routes/Form');
 var user = require('./Routes/Users');
 var survey = require('./Routes/SurveyDataCollector');
 var question = require('./Routes/Questions');
+var response = require('./Routes/ResponseServer');
 
 app.use('/wiki', wiki);
 app.use('/Form', form);
 app.use('/User', user);
 app.use('/survey', survey);
 app.use('/question', question);
+app.use('/response', response);
 
 
 //Global Variable Declaration

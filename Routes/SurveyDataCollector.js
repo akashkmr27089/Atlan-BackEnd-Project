@@ -31,6 +31,7 @@ router.delete('/DeleteQandA', async function (req, res) {
     var userName = req.body.userName;
     var formId = req.body.formId;
     var quesitonId = req.body.quesitonId;
+    console.log(userName, formId, quesitonId);
     var response = await SurveyDataCollector.DeleteQandA(userName, formId, quesitonId);
     res.send(response);
 });

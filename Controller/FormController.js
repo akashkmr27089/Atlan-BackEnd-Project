@@ -5,34 +5,6 @@ var MongoClient = require('mongodb').MongoClient;
 var database = process.env.DATABASE;
 const User = require('./UsersController');
 
-function FetchData() {
-    console.log(database)
-    var data = null;
-    return new Promise(resolve => {
-        MongoClient.connect(url, function (err, db) {
-            if (err) throw errr;
-            console.log("Database connected");
-            var dbo = db.db(database);
-            dbo.collection('customers').find({}).limit(3).toArray(function (err, res) {
-                if (err) throw err;
-                res.forEach(function (element) {
-                    // console.log(element.address);
-                })
-                // db.close()
-            });
-
-            dbo.collection('customers').find({}).limit(3).toArray(function (err, res) {
-                if (err) throw err;
-                // console.log(res);
-                data = res;
-                resolve(res);
-                db.close();
-            });
-        });
-        // resolve(data);
-    });
-}
-
 //Function Used for Creating Form if the User Exists
 async function createForm(userId) {
     var IfUserExists_flag = await User.IfUserExists(userId);
@@ -124,5 +96,4 @@ async function deletForm(FormId) {
 module.exports = {
     createForm: createForm,
     deletForm: deletForm,
-    FetchData: FetchData
 }

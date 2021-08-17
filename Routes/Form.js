@@ -19,8 +19,8 @@ router.get('/', function (req, res) {
 //Create Form 
 router.post('/CreateForm', async (req, res) => {
     logger.info(`/CreateForm Post Endpont`)
-    var userName = req.body.userName
-    var response = await FormController.createForm(userName);
+    var userId = req.body.userId
+    var response = await FormController.createForm(userId);
     console.log("DataOutput", response);
     res.send(response);
 });
