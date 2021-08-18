@@ -2,6 +2,7 @@ var url = process.env.DB_URL;
 const logger = require("../src/Logger");
 var MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb');
+const SendSms = require('../src/sms');
 var database = process.env.DATABASE;
 
 
@@ -145,6 +146,10 @@ async function surveyValidity(formId, uniqueId) {
                                 // Form Exists and its already filled
                                 resolve({ response: false, status: 1 })
                                 //Function to Send the Data for Notification
+                                var body = `Successfully Submitted Form ${result.formId} with User ${result.uniqueId}
+                                            . Your Submissions ${JSON.stringify(result.QuestionStack)}`;
+                                console.log(body, result);
+                                SendSms.sendSms(body, result.phoneNumber);
                             } else {
                                 // Form Exists and its not filled yet
                                 resolve({ response: true, status: 0 })
