@@ -157,7 +157,7 @@ async function surveyValidity(formId, uniqueId) {
     });
 }
 
-async function ResposeDataHandler(formId, uniqueId, dataEntry, submit) {
+async function ResposeDataHandler(formId, uniqueId, dataEntry, submit, phoneNumber) {
     return new Promise(resolve => {
         MongoClient.connect(url, (err, db) => {
             if (err) {
@@ -173,7 +173,7 @@ async function ResposeDataHandler(formId, uniqueId, dataEntry, submit) {
                         db.close();
                     } else {
                         if (res == undefined) {
-                            var data = { formId: formId, uniqueId: uniqueId, QuestionStack: dataEntry, submit: submit }
+                            var data = { formId: formId, uniqueId: uniqueId, QuestionStack: dataEntry, submit: submit, phoneNumber: phoneNumber }
                             dbo.collection("Response").insertOne(data, (err, results) => {
                                 if (err) {
                                     logger.error(err.message);
@@ -202,14 +202,14 @@ async function ResposeDataHandler(formId, uniqueId, dataEntry, submit) {
 }
 
 //The Function to send response based on QuestionsId and its Answer 
-async function sendData(formId, uniqueId, dataEntry, submit) {
+async function sendData(formId, uniqueId, dataEntry, submit, phoneNumber) {
     // In the Survey DataEntry, store the data with some unique id and the data 
     // {uniqueId:"##", DataEntry: {}, tags:{}, submit: bool}
     return new Promise(async resolve => {
         var response = await surveyValidity(formId, uniqueId);
         console.log("Response from the Form", response);
         if ((response.response == false && response.status == 0) || (response.response == true && response.status == 0)) {
-            var data = await ResposeDataHandler(formId, uniqueId, dataEntry, submit)
+            var data = await ResposeDataHandler(formId, uniqueId, dataEntry, submit, phoneNumber)
             resolve({ response: true, data: data })
         } else {
             // Do Nothing Just Returned form is already Submitted 
@@ -219,7 +219,7 @@ async function sendData(formId, uniqueId, dataEntry, submit) {
     });
 }
 
-async function getSubmittedData(formId, userId) {
+async function getSubmittedData(formId, uniqueId) {
     return new Promise(resolve => {
         MongoClient.connect(url, (err, db) => {
             if (err) {
@@ -227,15 +227,14 @@ async function getSubmittedData(formId, userId) {
                 resolve({ response: false })
                 db.close();
             } else {
-                var querry = { formId: formId, userId: userId }
+                var querry = { formId: formId, uniqueId: uniqueId }
                 var dbo = db.db(database);
-                dbo.collection("Response").find(querry).toArray((err, result) => {
+                dbo.collection("Response").findOne(querry, (err, result) => {
                     if (err) {
                         logger.error(err.message);
                         resolve({ response: false })
                         db.close();
                     } else {
-                        console.log(result)
                         resolve({ result: result })
                     }
                 })

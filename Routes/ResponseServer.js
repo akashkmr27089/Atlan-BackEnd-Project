@@ -17,10 +17,11 @@ router.post('/sendData', async (req, res) => {
     var formId = req.body.formId;
     var uniqueId = req.body.uniqueId;
     var dataEntry = req.body.dataEntry;
+    var phoneNumber = req.body.phoneNumber;
     var response = false;
     var submit = req.body.submit;
-    console.log(formId, uniqueId, dataEntry, submit);
-    var response = await Response.sendData(formId, uniqueId, dataEntry, submit);
+    console.log(formId, uniqueId, dataEntry, submit, phoneNumber);
+    var response = await Response.sendData(formId, uniqueId, dataEntry, submit, phoneNumber);
     res.send(response);
 });
 
