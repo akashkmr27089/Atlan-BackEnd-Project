@@ -129,20 +129,22 @@ async function surveyValidity(formId, uniqueId) {
                 logger.info("Connection Establised with the MongoDb");
                 var dbo = db.db(database);
                 var querry = { uniqueId: uniqueId, formId: formId }
-                dbo.collection("Responses").findOne(querry, (err, result) => {
+                dbo.collection("Response").findOne(querry, (err, result) => {
                     if (err) {
                         logger.error(err.message);
                         resolve({ response: false, status: -1 })
                         db.close();
                     } else {
+                        console.log(result);
                         if (result == undefined) {
                             // Form Does Not Exists => Status  = 0
                             resolve({ response: false, status: 0 });
                         } else {
                             // Form Exists 
-                            if (result.status == 1) {
+                            if (result.submit == 1) {
                                 // Form Exists and its already filled
                                 resolve({ response: false, status: 1 })
+                                //Function to Send the Data for Notification
                             } else {
                                 // Form Exists and its not filled yet
                                 resolve({ response: true, status: 0 })
@@ -153,10 +155,9 @@ async function surveyValidity(formId, uniqueId) {
             }
         });
     });
-
 }
 
-async function ResposeDataHandler(formId, uniqueId, dataEntry) {
+async function ResposeDataHandler(formId, uniqueId, dataEntry, submit) {
     return new Promise(resolve => {
         MongoClient.connect(url, (err, db) => {
             if (err) {
@@ -165,14 +166,14 @@ async function ResposeDataHandler(formId, uniqueId, dataEntry) {
             } else {
                 var dbo = db.db(database);
                 var querry = { formId: formId, uniqueId: uniqueId }
-                var updateEntry = { $set: { QuestionStack: dataEntry } }
+                var updateEntry = { $set: { QuestionStack: dataEntry, submit: submit } }
                 dbo.collection("Response").findOne(querry, (err, res) => {
                     if (err) {
                         logger.error(err.message);
                         db.close();
                     } else {
                         if (res == undefined) {
-                            var data = { formId: formId, uniqueId: uniqueId, QuestionStack: dataEntry }
+                            var data = { formId: formId, uniqueId: uniqueId, QuestionStack: dataEntry, submit: submit }
                             dbo.collection("Response").insertOne(data, (err, results) => {
                                 if (err) {
                                     logger.error(err.message);
@@ -201,13 +202,14 @@ async function ResposeDataHandler(formId, uniqueId, dataEntry) {
 }
 
 //The Function to send response based on QuestionsId and its Answer 
-async function sendData(formId, uniqueId, dataEntry) {
+async function sendData(formId, uniqueId, dataEntry, submit) {
     // In the Survey DataEntry, store the data with some unique id and the data 
     // {uniqueId:"##", DataEntry: {}, tags:{}, submit: bool}
     return new Promise(async resolve => {
-        var response = await surveyValidity(formId, uniqueId)
+        var response = await surveyValidity(formId, uniqueId);
+        console.log("Response from the Form", response);
         if ((response.response == false && response.status == 0) || (response.response == true && response.status == 0)) {
-            var data = await ResposeDataHandler(formId, uniqueId, dataEntry)
+            var data = await ResposeDataHandler(formId, uniqueId, dataEntry, submit)
             resolve({ response: true, data: data })
         } else {
             // Do Nothing Just Returned form is already Submitted 
@@ -225,7 +227,6 @@ async function getSubmittedData(formId, userId) {
                 resolve({ response: false })
                 db.close();
             } else {
-                // resolve(true)
                 var querry = { formId: formId, userId: userId }
                 var dbo = db.db(database);
                 dbo.collection("Response").find(querry).toArray((err, result) => {

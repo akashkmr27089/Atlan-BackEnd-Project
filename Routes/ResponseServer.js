@@ -18,8 +18,9 @@ router.post('/sendData', async (req, res) => {
     var uniqueId = req.body.uniqueId;
     var dataEntry = req.body.dataEntry;
     var response = false;
-    // console.log(formId, uniqueId, dataEntry);
-    var response = await Response.sendData(formId, uniqueId, dataEntry);
+    var submit = req.body.submit;
+    console.log(formId, uniqueId, dataEntry, submit);
+    var response = await Response.sendData(formId, uniqueId, dataEntry, submit);
     res.send(response);
 });
 
